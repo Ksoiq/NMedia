@@ -3,7 +3,7 @@ package ru.netology.nmedia
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.annotation.DrawableRes
+import ru.netology.nmedia.data.impl.PostAdapter
 import ru.netology.nmedia.databinding.ActivityMainBinding
 import ru.netology.nmedia.viewModel.PostViewModel
 
@@ -17,33 +17,40 @@ class MainActivity : AppCompatActivity() {
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel.data.observe(this) { post ->
-            binding.render(post)
-        }
+        val adapter = PostAdapter(
+            viewModel::onLikeClicked,
+            viewModel::onShareClick
+        )
+        binding.postsRecyclerView.adapter = adapter
 
-
-        binding.activityPost.likeButton.setOnClickListener {
-            viewModel.onLikeClicked()
-        }
-
-        binding.activityPost.shareButton.setOnClickListener{
-            viewModel.onShareClick()
+        viewModel.data.observe(this) { posts ->
+             adapter.submitList(posts)
         }
 
     }
 
 
-    private fun ActivityMainBinding.render(post: Post) {
-        activityPost.authorName.text = post.author
-        activityPost.textField.text = post.content
-        activityPost.date.text = post.published
-        activityPost.likeCount.text = Counter.displayFormatting(post.likes)
-        activityPost.shareCount.text = Counter.displayFormatting(post.shares)
-        activityPost.likeButton.setImageResource(getLikedIconResId(post.likedByMe))
-    }
+//    private fun ActivityMainBinding.render(posts: List<Post>) {
+//        for (post in posts) {
+//            PostBinding.inflate(
+//                layoutInflater, root, true
+//            ).render(post)
+//        }
+//    }
 
-    @DrawableRes
-    private fun getLikedIconResId(liked: Boolean) =
-        if (liked) R.drawable.ic_liked_24 else R.drawable.ic_like_24
+//    private fun PostBinding.render(post: Post) {
+//        authorName.text = post.author
+//        textField.text = post.content
+//        date.text = post.published
+//        likeCount.text = Counter.displayFormatting(post.likes)
+//        shareCount.text = Counter.displayFormatting(post.shares)
+//        likeButton.setImageResource(getLikedIconResId(post.likedByMe))
+//        likeButton.setOnClickListener { viewModel.onLikeClicked(post) }
+//        shareButton.setOnClickListener { viewModel.onShareClick(post) }
+//    }
+
+//    @DrawableRes
+//    private fun getLikedIconResId(liked: Boolean) =
+//        if (liked) R.drawable.ic_liked_24 else R.drawable.ic_like_24
 
 }
